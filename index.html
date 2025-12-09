@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Amon Ayebare Electronics – Loan & Cash System (HTML Version)</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body {
+    background:#f5f7fb;
+    font-family: Arial;
+}
+.sidebar {
+    width:230px;
+    position:fixed;
+    top:0;
+    left:0;
+    height:100vh;
+    background:#fff;
+    padding:20px;
+    border-right:1px solid #ddd;
+    display:none; /* hidden until login */
+}
+.sidebar .nav-link {
+    padding:10px;
+    color:#444;
+    font-weight:500;
+}
+.sidebar .nav-link:hover, 
+.sidebar .nav-link.active {
+    background:#0d6efd;
+    color:#fff;
+    border-radius:6px;
+}
+.content {
+    margin-left:250px;
+    padding:25px;
+    display:none;
+}
+.card {
+    box-shadow:0 3px 8px rgba(0,0,0,.05);
+    border-radius:8px;
+}
+.brand {
+    font-size:22px;
+    font-weight:700;
+    color:#0d6efd;
+}
+.page { display:none; }
+#loginScreen {
+    max-width:400px;
+    margin:auto;
+    margin-top:80px;
+}
+</style>
+
+<script>
+// ========================== LOGIN & USER SYSTEM ==========================
+// Store default admin account
+if(!localStorage.getItem("users")){
+    const defaultAdmin = [
+        {id:1, name:"AMON AYEBARE", email:"admin@amon.com", phone:"0700000000", role:"admin", password:"admin123"}
+    ];
+    localStorage.setItem("users", JSON.stringify(defaultAdmin));
+}
+
+// Login Function
+function loginUser(){
+    let email = document.getElementById("loginEmail").value;
+    let pass = document.getElementById("loginPass").value;
+
+    let users = JSON.parse(localStorage.getItem("users"));
+
+    let found = users.find(u => u.email === email && u.password === pass);
+
+    if(found){
+        localStorage.setItem("loggedUser", JSON.stringify(found));
+
+        document.getElementById("loginScreen").style.display="none";
+        document.querySelector(".sidebar").style.display="block";
+        document.querySelector(".content").style.display="block";
+
+        showPage("dashboard");
+    } else {
+        alert("Incorrect email or password");
+    }
+}
+
+// Logout
+function logout(){
+    localStorage.removeItem("loggedUser");
+    location.reload();
+}
+
+// ========================== PAGE SWITCHER ==========================
+function showPage(page){
+    document.querySelectorAll('.page').forEach(p => p.style.display="none");
+    document.getElementById(page).style.display="block";
+
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove("active"));
+    const link = document.getElementById("link-" + page);
+    if(link) link.classList.add("active");
+}
+
+// ========================== ADD USER ==========================
+function addUser(){
+    let name = document.getElementById("uName").value;
+    let email = document.getElementById("uEmail").value;
+    let phone = document.getElementById("uPhone").value;
+    let role = document.getElementById("uRole").value;
+    let pass = document.getElementById("uPass").value;
+
+    let users = JSON.parse(localStorage.getItem("users"));
+
+    users.push({
+        id: users.length+1,
+        name:name, email:email, phone:phone, role:role, password:pass
+    });
+
+    localStorage.setItem("users", JSON.stringify(users));
+
+    alert("User created successfully");
+    loadUsers();
+}
+
+// Load users into table
+function loadUsers(){
+    let users = JSON.parse(localStorage.getItem("users"));
+    let rows = "";
+
+    users.forEach(u => {
+        rows += `
+            <tr>
+                <td>${u.id}</td>
+                <td>${u.name}</td>
+                <td>${u.email}</td>
+                <td>${u.phone}</td>
+                <td>${u.role}</td>
+            </tr>
+        `;
+    });
+
+    document.getElementById("userTable").innerHTML = rows;
+}
+</script>
+
+</head>
+<body>
+
+<!-- ====================== LOGIN SCREEN ====================== -->
+<div id="loginScreen" class="card p-4">
+    <h3 class="mb-3 text-center">Login</h3>
+
+    <input id="loginEmail" type="email" class="form-control mb-2" placeholder="Email" required>
+    <input id="loginPass" type="password" class="form-control mb-3" placeholder="Password" required>
+
+    <button class="btn btn-primary w-100" onclick="loginUser()">Login</button>
+</div>
+
+<!-- ====================== SIDEBAR ====================== -->
+<div class="sidebar">
+    <div class="brand">AMON AYEBARE</div>
+    <small class="text-muted">Electronics Kabale</small>
+    <hr>
+
+    <a id="link-dashboard" class="nav-link" href="#" onclick="showPage('dashboard')">Dashboard</a>
+    <a id="link-products" class="nav-link" href="#" onclick="showPage('products')">Products</a>
+    <a id="link-customers" class="nav-link" href="#" onclick="showPage('customers')">Customers</a>
+    <a id="link-loans" class="nav-link" href="#" onclick="showPage('loans')">Loans</a>
+    <a id="link-sales" class="nav-link" href="#" onclick="showPage('sales')">Sales</a>
+    <a id="link-agents" class="nav-link" href="#" onclick="showPage('agents')">Agents</a>
+    <a id="link-users" class="nav-link" href="#" onclick="showPage('users'); loadUsers()">User Accounts</a>
+
+    <a class="nav-link text-danger mt-3" href="#" onclick="logout()">Logout</a>
+</div>
+
+<!-- ====================== CONTENT ====================== -->
+<div class="content">
+
+<!-- Dashboard -->
+<div id="dashboard" class="page">
+    <h2>Dashboard</h2>
+    <div class="row">
+        <div class="col-md-4"><div class="card p-3"><h6>Total Products</h6><h3>1</h3></div></div>
+        <div class="col-md-4"><div class="card p-3"><h6>Total Customers</h6><h3>3</h3></div></div>
+        <div class="col-md-4"><div class="card p-3"><h6>Total Sales</h6><h3>4</h3></div></div>
+    </div>
+</div>
+
+<!-- Products -->
+<div id="products" class="page">
+    <h2>Products</h2>
+    <div class="card p-3 mb-3">
+        <h5>Add Product</h5>
+        <input class="form-control mb-2" placeholder="Product Name">
+        <input class="form-control mb-2" placeholder="Price">
+        <input class="form-control mb-2" placeholder="Stock">
+        <button class="btn btn-primary">Add Product</button>
+    </div>
+</div>
+
+<!-- Customers -->
+<div id="customers" class="page">
+    <h2>Customers</h2>
+    <div class="card p-3 mb-3">
+        <h5>Add Customer</h5>
+        <input class="form-control mb-2" placeholder="Full Name">
+        <input class="form-control mb-2" placeholder="Phone">
+        <input class="form-control mb-2" placeholder="National ID">
+        <button class="btn btn-primary">Add Customer</button>
+    </div>
+</div>
+
+<!-- Loans -->
+<div id="loans" class="page">
+    <h2>Loans</h2>
+    <div class="card p-3 mb-3">
+        <h5>Register Loan</h5>
+        <input class="form-control mb-2" placeholder="Customer Name">
+        <input class="form-control mb-2" placeholder="Product">
+        <input class="form-control mb-2" placeholder="Deposit">
+        <button class="btn btn-primary">Submit Loan</button>
+    </div>
+</div>
+
+<!-- Sales -->
+<div id="sales" class="page">
+    <h2>Sales</h2>
+    <div class="card p-3 mb-3">
+        <h5>Cash Sale</h5>
+        <input class="form-control mb-2" placeholder="Product">
+        <input class="form-control mb-2" placeholder="Qty">
+        <input class="form-control mb-2" placeholder="Amount Paid">
+        <button class="btn btn-success">Record Sale</button>
+    </div>
+</div>
+
+<!-- Agents -->
+<div id="agents" class="page">
+    <h2>Agents</h2>
+    <div class="card p-3 mb-3">
+        <h5>Add Agent (UI Only)</h5>
+        <input class="form-control mb-2" placeholder="Agent Name">
+        <input class="form-control mb-2" placeholder="Phone">
+        <button class="btn btn-primary">Add Agent</button>
+    </div>
+</div>
+
+<!-- User Accounts -->
+<div id="users" class="page">
+    <h2>User Accounts (Admin)</h2>
+
+    <div class="card p-3 mb-3">
+        <h5>Create User Account</h5>
+
+        <input id="uName" class="form-control mb-2" placeholder="Full Name">
+        <input id="uEmail" class="form-control mb-2" placeholder="Email">
+        <input id="uPhone" class="form-control mb-2" placeholder="Phone">
+
+        <select id="uRole" class="form-control mb-2">
+            <option value="admin">Admin</option>
+            <option value="agent">Agent</option>
+        </select>
+
+        <input id="uPass" type="password" class="form-control mb-2" placeholder="Password">
+
+        <button class="btn btn-primary" onclick="addUser()">Create User</button>
+    </div>
+
+    <div class="card p-3">
+        <h5>Existing Users</h5>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th>
+                </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>
